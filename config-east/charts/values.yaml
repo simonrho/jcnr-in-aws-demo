@@ -1,0 +1,205 @@
+####################################################################
+#                 Common Configuration (global vars)               #
+####################################################################
+global:
+  registry: 709825985650.dkr.ecr.us-east-1.amazonaws.com/
+  # uncomment below if all images are available in the same path; it will
+  # take precedence over "repository" paths under "common" section below
+  repository: juniper-networks/
+
+  # uncomment below if you are using a private registry that needs authentication
+  # registryCredentials - Base64 representation of your Docker registry credentials
+  # secretName - Name of the Secret object that will be created
+  #imagePullSecret:
+  #  registryCredentials: <base64-encoded-credential>
+  #  secretName: regcred
+
+  common:
+    vrouter:
+      repository: juniper-networks/
+      tag: R23.2-156
+    crpd:
+      repository: juniper-networks/
+      tag: 23.2R1.14
+    jcnrcni:
+      repository: juniper-networks/
+      tag: 23.2-20230628-8cf4350
+
+  # Number of replicas for cRPD; this option must be used for multinode clusters
+  # JCNR will take 1 as default if replicas is not specified
+  #replicas: "3"
+  
+  # storageClass: Name of the storage class for cRPD. This option is must for
+  # cloud deployments such as AWS where gp2 can be used
+  storageClass: gp2
+
+  #noLocalSwitching: [700]
+
+  # fabricInterface: provide a list of interfaces to be bound to dpdk
+  # You can also provide subnets instead of interface names. Interfaces name take precedence over
+  # Subnet/Gateway combination if both specified (although there is no reason to specify both)
+  # Subnet/Gateway combination comes handy when the interface names vary in a multi-node cluster
+  fabricInterface:
+  #########################
+  # L2 only
+  #- eth1:
+  #    ddp: "auto"                # ddp parameter is optional; options include auto or on or off; default: off
+  #    interface_mode: trunk
+  #    vlan-id-list: [100, 200, 300, 700-705]
+  #    storm-control-profile: rate_limit_pf1
+  #    native-vlan-id: 100
+  #    no-local-switching: true
+  #- eth2:
+  #    ddp: "auto"                # ddp parameter is optional; options include auto or on or off; default: off
+  #    interface_mode: trunk
+  #    vlan-id-list: [700]
+  #    storm-control-profile: rate_limit_pf1
+  #    native-vlan-id: 100
+  #    no-local-switching: true 
+  #- bond0:
+  #    ddp: "auto" # auto/on/off  # ddp parameter is optional; options include auto or on or off; default: off
+  #    interface_mode: trunk
+  #    vlan-id-list: [100, 200, 300, 700-705]
+  #    storm-control-profile: rate_limit_pf1
+  #    #native-vlan-id: 100
+  #    #no-local-switching: true
+
+  #########################
+  # L3  only
+  #- eth1:
+  #    ddp: "off"                 # ddp parameter is optional; options include auto or on or off; default: off
+  #- eth2:
+  #    ddp: "off"                 # ddp parameter is optional; options include auto or on or off; default: off
+  ########################
+
+  # L2L3
+  #- eth1:
+  #    ddp: "auto"                # ddp parameter is optional; options include auto or on or off; default: off
+  #- eth2:
+  #    ddp: "auto"                # ddp parameter is optional; options include auto or on or off; default: off
+  #    interface_mode: trunk
+  #    vlan-id-list: [100, 200, 300, 700-705]
+  #    storm-control-profile: rate_limit_pf1
+  #    native-vlan-id: 100
+  #    no-local-switching: true
+  ##################################
+
+  # Provide subnets instead of interface names
+  # Interfaces will be auto-detected in each subnet
+  # Only one of the interfaces or subnet range must 
+  # be configured. This form of input is particularly 
+  # helpful when the interface names vary in a multi-node 
+  # K8s cluster
+  #- subnet: 10.40.1.0/24
+  #  gateway: 10.40.1.1
+  #  ddp: "off"                     # ddp parameter is optional; options include auto or on or off; default: off
+  #- subnet: 192.168.1.0/24
+  #  gateway: 192.168.1.1
+  #  ddp: "off"                     # ddp parameter is optional; options include auto or on or off; default: off
+
+  - subnet: 10.0.255.0/24
+    gateway: 10.0.255.1
+    ddp: "off"
+  - subnet: 10.1.0.0/24
+    ddp: "off"
+  - subnet: 10.1.1.0/24
+    ddp: "off"
+
+  ##################################
+  # fabricWorkloadInterface is applicable only for Pure L2 deployments
+  #
+  #fabricWorkloadInterface:
+  #- enp59s0f1v0:
+  #    interface_mode: access
+  #    vlan-id-list: [700]
+  #- enp59s0f1v1:
+  #    interface_mode: trunk
+  #    vlan-id-list: [800, 900]
+ #########################
+
+  # defines the log severity. Possible options: DEBUG, INFO, WARN, ERR
+  log_level: "INFO"
+
+  # "log_path": this directory will contain various jcnr related descriptive logs
+  # such as contrail-vrouter-agent.log, contrail-vrouter-dpdk.log etc.
+  log_path: "/var/log/jcnr/"
+  # "syslog_notifications": absolute path to the file that will contain syslog-ng
+  # generated notifications in json format
+  syslog_notifications: "/var/log/jcnr/jcnr_notifications.json"
+
+  # nodeAffinity: Can be used to inject nodeAffinity for vRouter, cRPD and syslog-ng pods
+  # You may label the nodes where we wish to deploy JCNR and inject affinity accodingly
+  #nodeAffinity:
+  #- key: node-role.kubernetes.io/worker
+  #  operator: Exists
+  #- key: node-role.kubernetes.io/master
+  #  operator: DoesNotExist
+  #- key: kubernetes.io/hostname
+  #  operator: In
+  #  values:
+  #  - example-host-1
+
+  nodeAffinity:
+  - key: key1
+    operator: In
+    values:
+    - jcnr
+
+  # cni_bin_dir: Path where the CNI binary will be put; default: /opt/cni/bin       
+  # this may be overriden in distributions other than vanilla K8s                                                           
+  # e.g. OpenShift - you may use /var/lib/cni/bin or /etc/kubernetes/cni/net.d
+  #cni_bin_dir:  /var/lib/cni/bin
+
+  # grpcTelemetryPort: use this parameter to override cRPD telemetry gRPC server default port of 50051
+  #grpcTelemetryPort: 50055
+
+  # grpcVrouterPort: use this parameter to override vRouter gRPC server default port of 50052
+  #grpcVrouterPort: 50060
+
+jcnr-vrouter:
+  # restoreInterfaces: setting this to true will restore the interfaces
+  # back to their original state in case vrouter pod crashes or restarts
+  restoreInterfaces: true
+
+ # Enable bond interface configurations L2 only or L2 L3 deployment
+
+  #bondInterfaceConfigs:
+  #  - name: "bond0"
+  #    mode: 1             # ACTIVE_BACKUP MODE
+  #    slaveInterfaces:
+  #    - "enp59s0f0v0"
+  #    - "enp59s0f0v1"
+
+  # MTU for all physical interfaces( all VF’s and  PF’s)
+  mtu: "9000"
+
+  # vrouter fwd core mask
+  # if qos is enabled, you will need to allocate 4 CPU cores (primary and siblings)
+  cpu_core_mask: "2,3"
+
+  # rate limit profiles for bum traffic on fabric interfaces in bytes per second
+  stormControlProfiles:
+    rate_limit_pf1:
+      bandwidth:
+        level: 0
+    #rate_limit_pf2:
+    #  bandwidth:
+    #    level: 0
+
+  # Set ddp to enable Dynamic Device Personalization (DDP) 
+  # Provides datapath optimization at NIC for traffic like GTPU, SCTP etc.
+  # Options include auto or on or off; default: off
+  ddp: "auto"
+
+  # Set true/false to Enable or Disable QOS, note: QOS is not supported on X710 NIC.
+  qosEnable: false
+
+  # core pattern to denote how the core file will be generated
+  # if left empty, JCNR pods will not overwrite the default pattern
+  corePattern: ""
+
+  # path for the core file; vrouter considers /var/crashes as default value if not specified
+  coreFilePath: /var/crash
+
+  # uio driver will be vfio-pci or uio_pci_generic
+  vrouter_dpdk_uio_driver: "vfio-pci"

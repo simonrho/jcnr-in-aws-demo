@@ -1,0 +1,64 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: red1
+spec:
+  config: '{
+    "cniVersion":"0.4.0",
+    "name": "red1-net",
+    "plugins": [
+      {
+        "type": "jcnr",
+        "args": {
+          "vrfName": "red1",
+          "vrfTarget": "65000:100"
+        },
+        "kubeConfig":"/var/lib/kubelet/kubeconfig"
+      }
+    ]
+  }'
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: podred1
+  annotations:
+    k8s.v1.cni.cncf.io/networks: |
+      [
+        {
+          "name": "red1",
+          "interface": "eth1",
+          "cni-args": {
+            "interfaceType": "veth",
+            "dataplane": "dpdk",
+            "mac": "aa:bb:cc:dd:ee:11",
+            "ipConfig": {
+              "ipv4": {
+                "address": "11.0.0.10/24",
+                "gateway": "11.0.0.1",
+                "routes": ["12.0.0.0/24"]
+              }
+            }
+          }
+        }
+      ]
+spec:
+  containers:
+    - name: podred1
+      image: public.ecr.aws/docker/library/alpine:latest
+      command: ["sleep", "infinite"]
+      ports:
+        - containerPort: 80
+      securityContext:
+        privileged: true
+        capabilities:
+          add:
+            - SYS_ADMIN
+            - NET_ADMIN
+            - SYS_NICE
+            - SYSLOG
+            - SYS_PTRACE
+            - SYS_RAWIO
+
