@@ -45,14 +45,11 @@ metadata:
         }
       ]
 spec:
+  hostname: blue3
   containers:
     - name: podblue3
-      # image: public.ecr.aws/ubuntu/ubuntu:22.04
-      # image: public.ecr.aws/docker/library/busybox:1.36
       image: public.ecr.aws/docker/library/alpine:latest
       command: ["sleep", "604800"]
-      ports:
-        - containerPort: 80
       securityContext:
         privileged: true
         capabilities:

@@ -2,6 +2,8 @@
 
 This repository provides Terraform scripts and configuration files to set up a demo environment for the Juniper Cloud-Native Router (JCNR) on AWS. It sets up AWS resources and configures JCNR in both east and west VPCs.
 
+<!-- TOC -->
+
 ## AWS Resources Created
 
 - EKS cluster with a single worker node.
@@ -46,13 +48,15 @@ Network Topology
 
 End-to-End Workload types
 ![Workload Types](./topology/demo-workload-types.png)
+
+
 ## Setup Guide
 
 ### 1. Clone the Repository
 
 ```bash
-git clone <GitHub Repository URL>
-cd <Repository Directory>
+git clone https://github.com/simonrho/jcnr-in-aws-demo.git
+cd jcnr-in-aws-demo
 ```
 
 ### 2. Install Necessary Tools
@@ -102,7 +106,40 @@ Apply the Terraform configurations:
 terraform apply
 ```
 
-### 5. Setting up JCNR Secrets
+### 5. Labeling EKS Worker Node 
+
+The JCNR deployment targets EKS worker nodes with a specific label. You can manually add this label using the following command:
+
+```bash
+kubectl label nodes $(kubectl get nodes -o json | jq -r .items[0].metadata.name) key1=jcnr --overwrite
+```
+
+**Note**: Once you add this label, which matches the dpdk env setup label key, the EKS node will reboot to apply the huge page setup. Please wait a few minutes for the node to come back up before proceeding with the next steps.
+
+
+### Optional: Using `setup.sh` under `secrets` directroy for Automated Setup
+For an effortless setup of JCNR secrets, including the license and root password, as well as adding the necessary label to the EKS worker node, you can make use of a provided setup script.
+
+Navigate to the secrets directory:
+```bash
+cd ~/demo/secrets
+```
+
+To run the script and set up the necessary configurations:
+
+```bash
+cd ./secrets
+./setup.sh
+```
+
+This script will apply the JCNR secrets and add the `key1=jcnr` label to your EKS worker nodes.
+
+**NOTE:** A daemonset service (`dpdk-env-setup`) is installed during the Terraform setup to prepare the DPDK running environment for JCNR. This service targets specific worker nodes with a particular tag/label. You can customize this in the Terraform code. The tag/label value is also used for JCNR helm chart installation, located in the `values.yaml` within the JCNR helm charts.
+
+For sample JCNR Junos configurations and workload configurations, refer to the config directories under config-east and config-west directory.
+
+
+### 6. Setting up JCNR Secrets
 
 Before you proceed with the installation of JCNR, it's crucial to configure the `jcnr-secrets.yaml` with the required credentials.
 
@@ -154,35 +191,6 @@ kubectl apply -f secrets/jcnr-secrets.yaml
 ```
 
 **NOTE:** Make sure you have obtained your license file from your account team and installed it in the `secrets.yaml` file as instructed above. Without the proper base64-encoded license file and root password in the `secrets.yaml` file, the cRPD Pod will remain in `CrashLoopBackOff` state.
-
-
-### 6. Labeling EKS Worker Node 
-
-The JCNR deployment targets EKS worker nodes with a specific label. You can manually add this label using the following command:
-
-```bash
-kubectl label nodes $(kubectl get nodes -o json | jq -r .items[0].metadata.name) key1=jcnr --overwrite
-```
-
-**Note**: Once you add this label, which matches the dpdk env setup label key, the EKS node will reboot to apply the huge page setup. Please wait a few minutes for the node to come back up before proceeding with the next steps.
-
-
-### Optional: Using `setup.sh` under `secrets` directroy for Automated Setup
-For an effortless setup of JCNR secrets, including the license and root password, as well as adding the necessary label to the EKS worker node, you can make use of a provided setup script.
-
-Navigate to the secrets directory:
-```bash
-cd ~/demo/secrets
-```
-
-To run the script and set up the necessary configurations:
-
-```bash
-cd ./secrets
-./setup.sh
-```
-
-This script will apply the JCNR secrets and add the `key1=jcnr` label to your EKS worker nodes.
 
 
 ### 7. Helm Setup for JCNR
@@ -237,6 +245,23 @@ cd jcnr
 cp ../config-west/charts/values.yaml ./values.yaml
 ```
 
-Note: A daemonset service (`dpdk-env-setup`) is installed during the Terraform setup to prepare the DPDK running environment for JCNR. This service targets specific worker nodes with a particular tag/label. You can customize this in the Terraform code. The tag/label value is also used for JCNR helm chart installation, located in the `values.yaml` within the JCNR helm charts.
+After setting the correct values, you can proceed with the JCNR installation using Helm:
 
-For sample JCNR Junos configurations and workload configurations, refer to the config directories under config-east and config-west directory.
+```bash
+helm install jcnr ./ -f values.yaml
+```
+Wait for a few minutes for the JCNR pods and services to be deployed. Once done, you can check the status using:
+
+```bash
+helm ls
+kubectl get pods -n jcnr
+kubectl get pods -n contrail
+```
+
+### 9. Cleanup or Teardown
+To safely remove all AWS resources and the JCNR deployment:
+
+```bash
+cd tf-aws/
+terraform destroy
+```

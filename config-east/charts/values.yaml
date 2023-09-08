@@ -71,6 +71,9 @@ global:
   #- eth2:
   #    ddp: "off"                 # ddp parameter is optional; options include auto or on or off; default: off
   ########################
+  - eth2 # peering facing interface
+  - eth3 # red2 ce facing interface
+  - eth4 # red3 ce facing interface
 
   # L2L3
   #- eth1:
@@ -96,14 +99,6 @@ global:
   #- subnet: 192.168.1.0/24
   #  gateway: 192.168.1.1
   #  ddp: "off"                     # ddp parameter is optional; options include auto or on or off; default: off
-
-  - subnet: 10.0.255.0/24
-    gateway: 10.0.255.1
-    ddp: "off"
-  - subnet: 10.1.0.0/24
-    ddp: "off"
-  - subnet: 10.1.1.0/24
-    ddp: "off"
 
   ##################################
   # fabricWorkloadInterface is applicable only for Pure L2 deployments

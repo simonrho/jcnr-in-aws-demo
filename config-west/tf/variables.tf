@@ -65,8 +65,7 @@ variable "vpc_secondary_cidr_block" {
 
 variable "vpc_secondary_subnets" {
   default = [
-    { name = "subnet1", cidr = "172.17.0.0/24", peer_cidr = "10.1.0.0/24", hostname = "Sunnyvale" },
-    { name = "subnet2", cidr = "172.17.1.0/24", peer_cidr = "10.1.1.0/24", hostname = "SFO" }
+    { name = "subnet1", cidr = "172.17.0.0/24", peer_cidr = "10.1.0.0/24", hostname = "blue2" }
   ]
   type = list(object({
     name = string

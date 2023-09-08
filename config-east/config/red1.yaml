@@ -45,12 +45,11 @@ metadata:
         }
       ]
 spec:
+  hostname: red1
   containers:
     - name: podred1
       image: public.ecr.aws/docker/library/alpine:latest
       command: ["sleep", "infinite"]
-      ports:
-        - containerPort: 80
       securityContext:
         privileged: true
         capabilities:
