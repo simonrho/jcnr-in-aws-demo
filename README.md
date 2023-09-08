@@ -2,8 +2,8 @@
 
 This repository provides Terraform scripts and configuration files to set up a demo environment for the Juniper Cloud-Native Router (JCNR) on AWS. It sets up AWS resources and configures JCNR in both east and west VPCs.
 
-<!-- START_TOC -->
-<!-- END_TOC -->
+<!-- START doctoc -->
+<!-- END doctoc -->
 
 ## AWS Resources Created
 
