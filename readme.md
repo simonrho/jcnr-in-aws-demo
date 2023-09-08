@@ -2,7 +2,6 @@
 
 This repository provides Terraform scripts and configuration files to set up a demo environment for the Juniper Cloud-Native Router (JCNR) on AWS. It sets up AWS resources and configures JCNR in both east and west VPCs.
 
-<!-- TOC -->
 
 ## AWS Resources Created
 
@@ -248,7 +247,7 @@ cp ../config-west/charts/values.yaml ./values.yaml
 After setting the correct values, you can proceed with the JCNR installation using Helm:
 
 ```bash
-helm install jcnr ./ -f values.yaml
+helm install jcnr .
 ```
 Wait for a few minutes for the JCNR pods and services to be deployed. Once done, you can check the status using:
 
