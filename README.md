@@ -222,35 +222,48 @@ Verify its contents:
 cat jcnr-secrets.yaml
 ```
 
-### 7. Helm Setup for JCNR
+ ### 7. AWS Marketplace Subscription for JCNR
 
-First, ensure that you are authenticated with AWS. Helm will use your AWS credentials to pull the JCNR helm charts from the AWS Marketplace.
+ Before you can proceed with Helm setup and pull JCNR helm charts, you need to visit the AWS Marketplace and subscribe to the JCNR container product.
 
-Login to your AWS account via Helm:
+ 1. Navigate to the [AWS Marketplace](https://aws.amazon.com/marketplace/).
+ 2. In the search bar, type "JCNR" and search.
+ 3. Click on the relevant product from the search results.
+ 4. Go through the product details and click on the "Subscribe" or "Continue to Subscribe" button.
+ 5. Complete the subscription process as prompted.
 
-```bash
-export HELM_EXPERIMENTAL_OCI=1
+ **Note:** Without this subscription, you won't have access to the JCNR helm charts and package images from the ECR (Elastic Container Registry). It's essential to ensure that the subscription is successful before proceeding further.
 
-aws ecr get-login-password \
-    --region us-east-1 | helm registry login \
-    --username AWS \
-    --password-stdin 709825985650.dkr.ecr.us-east-1.amazonaws.com
-```
+ ### 8. Helm Setup for JCNR
 
-Now, pull and untar the JCNR helm charts:
+ First, ensure that you are authenticated with AWS. Helm will use your AWS credentials to pull the JCNR helm charts from the AWS Marketplace.
 
-```bash
-helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/juniper-networks/jcnr --version 23.2.0
-```
+ Login to your AWS account via Helm:
 
-Untar the JCNR helm charts tar file:
-```bash
-tar zxvf jcnr-23.2.0.tgz 
-```
+ ```bash
+ export HELM_EXPERIMENTAL_OCI=1
 
+ aws ecr get-login-password \
+     --region us-east-1 | helm registry login \
+     --username AWS \
+     --password-stdin 709825985650.dkr.ecr.us-east-1.amazonaws.com
+ ```
 
-After successfully creating all AWS resources, install the JCNR with the helm charts downloaded from the AWS marketplace.
+ Now, pull and untar the JCNR helm charts:
 
+ ```bash
+ helm pull oci://709825985650.dkr.ecr.us-east-1.amazonaws.com/juniper-networks/jcnr --version 23.2.0
+ ```
+
+ Untar the JCNR helm charts tar file:
+
+ ```bash
+ tar zxvf jcnr-23.2.0.tgz 
+ ```
+
+ After successfully creating all AWS resources, install the JCNR with the helm charts downloaded from the AWS marketplace.
+
+ ---
 
 ### 8. Install JCNR with Helm
 
