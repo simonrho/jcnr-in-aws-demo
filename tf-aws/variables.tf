@@ -56,7 +56,7 @@ variable "peer_region" {
 variable "peer_cluster_name" {
   default = "tf-demo1-eks"
   type    = string
-}l
+}
 
 variable "vpc_secondary_cidr_block" {
   default = "172.17.0.0/16"

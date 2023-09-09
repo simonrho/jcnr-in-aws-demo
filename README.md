@@ -144,9 +144,9 @@ For sample JCNR Junos configurations and workload configurations, refer to the c
 
 Before you proceed with the installation of JCNR, it's crucial to configure the `jcnr-secrets.yaml` with the required credentials.
 
-#### Configure `jcnr-secrets.yaml`
+#### Configure `jcnr-secrets.yaml` Manually
 
-Enter the root password for your host server and your Juniper Cloud-Native Router license file into the `secrets/jcnr-secrets.yaml` file.
+Enter the JCNR root password and your Juniper Cloud-Native Router license file into the `secrets/jcnr-secrets.yaml` file.
 
 You can view the sample contents of the `jcnr-secrets.yaml` file below:
 
@@ -191,8 +191,36 @@ Apply the secrets to Kubernetes:
 kubectl apply -f secrets/jcnr-secrets.yaml
 ```
 
-**NOTE:** Make sure you have obtained your license file from your account team and installed it in the `secrets.yaml` file as instructed above. Without the proper base64-encoded license file and root password in the `secrets.yaml` file, the cRPD Pod will remain in `CrashLoopBackOff` state.
+**NOTE:** Make sure you have obtained your license file from your account team and installed it in the `secrets.yaml` file as instructed above. Without the proper base64-encoded license file and JCNR root password in the `secrets.yaml` file, the cRPD Pod will remain in `CrashLoopBackOff` state.
 
+#### Using the Assistant Tool to Configure `jcnr-secrets.yaml`
+For those who prefer a more streamlined approach, an assistant script named `build-secrets.sh` has been provided. Ensure that you've created two files: `jcnr-root-password.txt` (for your JCNR root password) and `jcnr-license.txt` (for your JCNR license). These files are **user-provided** and not included in the git cloned files.
+
+To use the script:
+
+```bash
+./build-secrets.sh <path-to-root-password-file> <path-to-jcnr-license-file>
+```
+
+Example:
+
+```bash
+./build-secrets.sh jcnr-root-password.txt jcnr-license.txt
+```
+
+After running the script, you'll find the generated `jcnr-secrets.yaml` in the current directory:
+
+
+```bash
+ls
+build-secrets.sh  jcnr-license.txt  jcnr-root-password.txt  jcnr-secrets.yaml  setup.sh
+```
+
+Verify its contents:
+
+```bash
+cat jcnr-secrets.yaml
+```
 
 ### 7. Helm Setup for JCNR
 
