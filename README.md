@@ -68,15 +68,38 @@ Run the provided script to install the required tools:
 ./install-tools.sh
 ```
 
-### 3. AWS Configuration
+ ### 3. AWS Configuration
 
-Configure AWS CLI with your credentials:
+ To configure the AWS Command Line Interface (CLI), you'll first need to obtain your Access Key ID and Secret Access Key from the AWS Management Console. Follow the steps below:
 
-```bash
-aws configure
-```
+ #### Obtaining AWS CLI Access Token from AWS Console:
 
-Ensure you provide the AWS accesskey, secretkey, region, and output format when prompted.
+ 1. Sign in to the [AWS Management Console](https://aws.amazon.com/console/).
+
+ 2. Click on your username at the top right corner of the console.
+
+ 3. From the drop-down menu, choose "My Security Credentials".
+
+ 4. Under the "Access keys (access key ID and secret access key)" section, click on "Create New Access Key". This will generate a new set of credentials.
+
+ 5. You'll see a pop-up window showing your newly created Access Key ID and Secret Access Key. Click "Download .csv" to save these credentials or note them down securely. **Important:** This is the only time you'll be able to view the Secret Access Key via the AWS Console. Ensure you store it securely.
+
+ #### Configuring AWS CLI:
+
+ Now that you have your AWS Access Key ID and Secret Access Key, you can configure AWS CLI:
+
+ ```bash
+ aws configure
+ ```
+
+ You'll be prompted to provide the following details:
+
+ - **AWS Access Key ID:** Enter the Access Key ID from the previously downloaded .csv or the one you noted down.
+ - **AWS Secret Access Key:** Enter the Secret Access Key.
+ - **Default region name:** Enter your preferred AWS region (e.g., `us-east-2`).
+ - **Default output format:** You can select `json`, `yaml`, `text`, or leave it blank for default.
+
+ **Note:** Always ensure you store your AWS credentials securely and avoid exposing them in any public or insecure locations.
 
 ### 4. Terraform Initialization and Apply
 
@@ -140,87 +163,89 @@ This script will apply the JCNR secrets and add the `key1=jcnr` label to your EK
 For sample JCNR Junos configurations and workload configurations, refer to the config directories under config-east and config-west directory.
 
 
-### 6. Setting up JCNR Secrets
+ ### 6. Setting up JCNR Secrets
 
-Before you proceed with the installation of JCNR, it's crucial to configure the `jcnr-secrets.yaml` with the required credentials.
+ Before you proceed with the installation of JCNR, it's crucial to configure the `jcnr-secrets.yaml` with the required credentials. There are two approaches to achieve this: Manually and using the provided Assistant Tool.
 
-#### Configure `jcnr-secrets.yaml` Manually
+ #### A. Configure `jcnr-secrets.yaml` Manually
 
-Enter the JCNR root password and your Juniper Cloud-Native Router license file into the `secrets/jcnr-secrets.yaml` file.
+ 1. Enter the JCNR root password and your Juniper Cloud-Native Router license file into the `secrets/jcnr-secrets.yaml` file.
 
-You can view the sample contents of the `jcnr-secrets.yaml` file below:
+ Sample contents of the `jcnr-secrets.yaml` file:
 
-```yaml
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: jcnr
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: jcnr-secrets
-  namespace: jcnr
-data:
-  root-password: <add your password in base64 format>
-  crpd-license: |
-    <add your license in base64 format>
-```
+ ```yaml
+ ---
+ apiVersion: v1
+ kind: Namespace
+ metadata:
+   name: jcnr
+ ---
+ apiVersion: v1
+ kind: Secret
+ metadata:
+   name: jcnr-secrets
+   namespace: jcnr
+ data:
+   root-password: <add your password in base64 format>
+   crpd-license: |
+     <add your license in base64 format>
+ ```
 
-Encode the password and license in base64:
+ 2. Encode the password and license in base64:
 
-1. To encode the password, create a file with only the plain text password:
+    - For the password:
 
-```bash
-echo "YourPlainTextPassword" > rootPasswordFile
-base64 -w 0 rootPasswordFile
-```
+ ```bash
+ echo "YourPlainTextPassword" > rootPasswordFile
+ base64 -w 0 rootPasswordFile
+ ```
 
-2. To encode the license file, issue the following command:
+    - For the license:
 
-```bash
-base64 -w 0 licenseFile
-```
+ ```bash
+ base64 -w 0 licenseFile
+ ```
 
-Copy the base64 outputs and paste them into the `secrets/jcnr-secrets.yaml` file at the respective places.
+ 3. Copy the base64 outputs and paste them into the `secrets/jcnr-secrets.yaml` file at the respective places.
 
-Apply the secrets to Kubernetes:
+ 4. Apply the secrets to Kubernetes:
 
-```bash
-kubectl apply -f secrets/jcnr-secrets.yaml
-```
+ ```bash
+ kubectl apply -f secrets/jcnr-secrets.yaml
+ ```
 
-**NOTE:** Make sure you have obtained your license file from your account team and installed it in the `secrets.yaml` file as instructed above. Without the proper base64-encoded license file and JCNR root password in the `secrets.yaml` file, the cRPD Pod will remain in `CrashLoopBackOff` state.
+ **NOTE:** Without the proper base64-encoded license file and JCNR root password in the `secrets.yaml` file, the cRPD Pod will remain in `CrashLoopBackOff` state.
 
-#### Using the Assistant Tool to Configure `jcnr-secrets.yaml`
-For those who prefer a more streamlined approach, an assistant script named `build-secrets.sh` has been provided. Ensure that you've created two files: `jcnr-root-password.txt` (for your JCNR root password) and `jcnr-license.txt` (for your JCNR license). These files are **user-provided** and not included in the git cloned files.
+ #### B. Using the Assistant Tool to Configure `jcnr-secrets.yaml`
 
-To use the script:
+ For a more streamlined approach, use the `build-secrets.sh` script. Before you start, create two files: `jcnr-root-password.txt` (JCNR root password) and `jcnr-license.txt` (JCNR license). These files are **user-provided** and are not part of the git cloned files.
 
-```bash
-./build-secrets.sh <path-to-root-password-file> <path-to-jcnr-license-file>
-```
+ 1. Run the script:
 
-Example:
+ ```bash
+ ./build-secrets.sh <path-to-root-password-file> <path-to-jcnr-license-file>
+ ```
 
-```bash
-./build-secrets.sh jcnr-root-password.txt jcnr-license.txt
-```
+ Example:
 
-After running the script, you'll find the generated `jcnr-secrets.yaml` in the current directory:
+ ```bash
+ ./build-secrets.sh jcnr-root-password.txt jcnr-license.txt
+ ```
 
+ 2. After execution, the generated `jcnr-secrets.yaml` will be in the current directory. Verify with:
 
-```bash
-ls
-build-secrets.sh  jcnr-license.txt  jcnr-root-password.txt  jcnr-secrets.yaml  setup.sh
-```
+ ```bash
+ ls
+ cat jcnr-secrets.yaml
+ ```
 
-Verify its contents:
+ 3. Apply the secrets to Kubernetes:
 
-```bash
-cat jcnr-secrets.yaml
-```
+ ```bash
+ kubectl apply -f jcnr-secrets.yaml
+ ```
+
+ **NOTE:** Ensure your license file is obtained from your account team and integrated correctly. Otherwise, the cRPD Pod might face issues.
 
  ### 7. AWS Marketplace Subscription for JCNR
 
