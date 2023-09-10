@@ -330,7 +330,7 @@ Adding label to eks worker nodes
 
  ---
 
-### 8. Install JCNR with Helm
+### 9. Install JCNR with Helm
 
 After successfully creating all AWS resources, install the JCNR with the helm charts downloaded from the AWS marketplace.
 
@@ -365,11 +365,11 @@ kubectl get pods -n jcnr
 kubectl get pods -n contrail
 ```
 
- ## Configure JCNR and Add workloads 
+ ### 10. Configure JCNR and Add workloads 
 
  Setting up the JCNR (Junos Cloud-Native Router) involves two primary tasks: configuring the JCNR router itself and adding the corresponding workloads. Workloads come in two flavors: Kubernetes pods that simulate CE (Customer Equipment) devices and EC2 instances. 
 
- ### Setting up JCNR Configurations
+ #### Setting up JCNR Configurations
 
  1. **For Kubernetes Pods:** Kubernetes configurations use `.yaml` files located in the `config-east` and `config-west` directories. When you deploy these configurations using `kubectl apply`, the system triggers the JCNR CNI driver. This driver dynamically builds the VRF configuration, adds it, and commits it to the cRPD of JCNR.
 
@@ -407,7 +407,7 @@ kubectl get pods -n contrail
  2. **For EC2 Instances:** For workloads that utilize EC2 instances, the connection to JCNR happens through regular ENI interfaces & VPC subnets. In these scenarios, there's no JCNR CNI involvement. Thus, manual VRF configurations must be added to the JCNR, which are specified in the `red*.conf` and `blue*.conf` files.
 
 
-### 9. Cleanup or Teardown
+## Cleanup or Teardown
 To safely remove all AWS resources and the JCNR deployment:
 
 ```bash
