@@ -369,8 +369,6 @@ kubectl get pods -n contrail
 
  Setting up the JCNR (Junos Cloud-Native Router) involves two primary tasks: configuring the JCNR router itself and adding the corresponding workloads. Workloads come in two flavors: Kubernetes pods that simulate CE (Customer Equipment) devices and EC2 instances. 
 
- #### Setting up JCNR Configurations
-
  1. **For Kubernetes Pods:** Kubernetes configurations use `.yaml` files located in the `config-east` and `config-west` directories. When you deploy these configurations using `kubectl apply`, the system triggers the JCNR CNI driver. This driver dynamically builds the VRF configuration, adds it, and commits it to the cRPD of JCNR.
 
  ```bash
