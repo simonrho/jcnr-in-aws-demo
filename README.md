@@ -267,8 +267,16 @@ This script will apply the JCNR secrets and add the `key1=jcnr` label to your EK
  2. Execute the `setup.sh` script:
 
  ```
- ./setup.sh
- ```
+./setup.sh
+Reading root password from jcnr-root-password.txt
+Reading license key from jcnr-license.txt
+Creating jcnr-secrets.yaml file
+Applying JCNR secrets and namespace
+namespace/jcnr unchanged
+secret/jcnr-secrets configured
+Enter label in format key=value (default is key1=jcnr):
+Adding label to eks worker nodes
+```
 
  Upon execution, the script will:
 
