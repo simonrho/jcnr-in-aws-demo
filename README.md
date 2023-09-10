@@ -334,7 +334,7 @@ Adding label to eks worker nodes
 
 After successfully creating all AWS resources, install the JCNR with the helm charts downloaded from the AWS marketplace.
 
-Use the `values.yaml` and `jcnr-secrets.yaml` from the appropriate charts directory of `config-east/charts` or `config-west/charts`.
+Use the `values.yaml` from the appropriate charts directory of `config-east/charts` or `config-west/charts`.
 
 Now, switch to the jcnr directory and install jcnr:
 
