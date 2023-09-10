@@ -217,9 +217,6 @@ This script will apply the JCNR secrets and add the `key1=jcnr` label to your EK
 
  **NOTE:** Without the proper base64-encoded license file and JCNR root password in the `secrets.yaml` file, the cRPD Pod will remain in `CrashLoopBackOff` state.
 
-### Optional: Using `setup.sh` under `secrets` directroy for Automated Setup
-For an effortless setup of JCNR secrets, including the license and root password, as well as adding the necessary label to the EKS worker node, you can make use of a provided setup script.
-
 
  #### B. Using the Assistant Tool to Configure `jcnr-secrets.yaml`
 
@@ -251,6 +248,36 @@ For an effortless setup of JCNR secrets, including the license and root password
  ```
 
  **NOTE:** Ensure your license file is obtained from your account team and integrated correctly. Otherwise, the cRPD Pod might face issues.
+
+
+
+ ### Optional: Streamlined Configuration using `setup.sh` 
+
+ For those looking to simplify and automate the processes described in Sections 5 and 6, the provided `setup.sh` script under the `secrets` directory offers an all-in-one solution. This script serves two main purposes:
+
+ 1. **JCNR Secrets Configuration:** It automates the creation of the `jcnr-secrets.yaml` file, ensuring the JCNR secrets (license and root password) are appropriately set.
+ 2. **Labeling the EKS Worker Node:** It ensures that the necessary label (used for targeting by the DPDK environment setup) is added to the EKS worker node.
+
+ To utilize this streamlined approach, follow the steps below:
+
+ ```
+ cd ~/demo/secrets
+ ```
+
+ 2. Execute the `setup.sh` script:
+
+ ```
+ ./setup.sh
+ ```
+
+ Upon execution, the script will:
+
+ - Create and apply the `jcnr-secrets.yaml` file with the JCNR secrets.
+ - Add the `key1=jcnr` label to your EKS worker nodes, making them identifiable for the JCNR deployment.
+
+ **NOTE:** While the `setup.sh` script offers convenience, it's essential to understand the underlying manual steps (as detailed in Sections 5 & 6) to troubleshoot potential issues or customize configurations further.
+
+
 
  ### 7. AWS Marketplace Subscription for JCNR
 
