@@ -5,17 +5,19 @@ This repository provides Terraform scripts and configuration files to set up a d
 <!-- START doctoc -->
 <!-- END doctoc -->
 
+
 ## AWS Resources Created
 
-- EKS cluster with a single worker node.
-- VPC Peering between the VPCs.
-- VPC and associated subnets.
-- EC2 instances acting as L3VPN CE devices.
-- Multus CNI driver for Kubernetes.
-- EBS CSI driver for Kubernetes.
-- DPDK environment setup DaemonSet in the worker node.
-- SSH key-pair for accessing EC2 instances and the EKS node.
-- Additional ENI interfaces on EKS node for JCNR data plane.
+ - VPC and associated subnets.
+ - VPC Peering between the VPCs.
+ - EKS cluster with a single worker node.
+ - Additional ENI interfaces on EKS node for JCNR data plane.
+ - EC2 instances acting as L3VPN CE devices.
+ - SSH key-pair for accessing EC2 instances.
+ - Multus CNI driver for Kubernetes.
+ - EBS CSI driver for Kubernetes.
+ - DPDK environment setup DaemonSet in the worker node.
+ - Kube config updated to incorporate the newly created EKS cluster.
 
 ## Directory Structure
 
@@ -138,11 +140,12 @@ The JCNR deployment targets EKS worker nodes with a specific label. You can manu
 kubectl label nodes $(kubectl get nodes -o json | jq -r .items[0].metadata.name) key1=jcnr --overwrite
 ```
 
-**Note**: Once you add this label, which matches the dpdk env setup label key, the EKS node will reboot to apply the huge page setup. Please wait a few minutes for the node to come back up before proceeding with the next steps.
+ **Note on DPDK Environment Setup:** 
+ During the infrastructure provisioning process, Terraform is employed to automate the creation and configuration of the required AWS resources. One such resource is a daemonset service named `dpdk-env-setup`. This service is designed to set up the DPDK running environment tailored for JCNR on your AWS Elastic Kubernetes Service (EKS) nodes. 
 
+ The `dpdk-env-setup` specifically targets worker nodes that are identified by a unique tag/label. If you wish to modify which nodes are targeted, you can adjust this tag/label specification directly in the Terraform configuration code (`variables.tf`). Furthermore, this tag/label value has significance beyond just the DPDK setup; it's also referenced during the JCNR helm chart installation, as specified in the `values.yaml` file within the JCNR helm charts.
 
-### Optional: Using `setup.sh` under `secrets` directroy for Automated Setup
-For an effortless setup of JCNR secrets, including the license and root password, as well as adding the necessary label to the EKS worker node, you can make use of a provided setup script.
+ One key detail to be cognizant of is the node reboot mechanism triggered by the DPDK setup. After assigning the specific tag/label, which matches the dpdk env setup label key, to a node, the node will automatically reboot. This reboot is necessary to apply the huge page setup required for optimal DPDK performance. It's imperative to pause for a few minutes, allowing the node to fully restart before proceeding further.
 
 Navigate to the secrets directory:
 ```bash
@@ -157,10 +160,6 @@ cd ./secrets
 ```
 
 This script will apply the JCNR secrets and add the `key1=jcnr` label to your EKS worker nodes.
-
-**NOTE:** A daemonset service (`dpdk-env-setup`) is installed during the Terraform setup to prepare the DPDK running environment for JCNR. This service targets specific worker nodes with a particular tag/label. You can customize this in the Terraform code. The tag/label value is also used for JCNR helm chart installation, located in the `values.yaml` within the JCNR helm charts.
-
-For sample JCNR Junos configurations and workload configurations, refer to the config directories under config-east and config-west directory.
 
 
  ### 6. Setting up JCNR Secrets
@@ -215,6 +214,10 @@ For sample JCNR Junos configurations and workload configurations, refer to the c
  ```
 
  **NOTE:** Without the proper base64-encoded license file and JCNR root password in the `secrets.yaml` file, the cRPD Pod will remain in `CrashLoopBackOff` state.
+
+### Optional: Using `setup.sh` under `secrets` directroy for Automated Setup
+For an effortless setup of JCNR secrets, including the license and root password, as well as adding the necessary label to the EKS worker node, you can make use of a provided setup script.
+
 
  #### B. Using the Assistant Tool to Configure `jcnr-secrets.yaml`
 
@@ -324,6 +327,48 @@ helm ls
 kubectl get pods -n jcnr
 kubectl get pods -n contrail
 ```
+
+ ## Configure JCNR and Add workloads 
+
+ Setting up the JCNR (Junos Cloud-Native Router) involves two primary tasks: configuring the JCNR router itself and adding the corresponding workloads. Workloads come in two flavors: Kubernetes pods that simulate CE (Customer Equipment) devices and EC2 instances. 
+
+ ### Setting up JCNR Configurations
+
+ 1. **For Kubernetes Pods:** Kubernetes configurations use `.yaml` files located in the `config-east` and `config-west` directories. When you deploy these configurations using `kubectl apply`, the system triggers the JCNR CNI driver. This driver dynamically builds the VRF configuration, adds it, and commits it to the cRPD of JCNR.
+
+ ```bash
+ kubectl exec -it -n jcnr kube-crpd-worker-sts-0 -c kube-crpd-worker -- bash
+ ```
+
+ After the Juniper cRPD banner appears:
+
+ ```plaintext
+           Containerized Routing Protocols Daemon (CRPD)
+ Copyright (C) 2020-2023, Juniper Networks, Inc. All rights reserved.
+ ```
+
+ Access the Junos CLI with `cli`, then enter the configuration mode using `edit`.
+
+ ```bash
+ root@ip-172-16-1-77:/# cli
+ root@ip-172-16-1-77.us-west-2.compute.internal> edit
+ ```
+
+ Within this mode, you can copy and paste the desired JCNR configurations directly from the respective `.conf` files found within the `config-east` or `config-west` directories.
+
+ Deploy the Kubernetes workloads with:
+
+ ```bash
+ kubectl apply -f config-east/config/red1.yaml
+ kubectl apply -f config-west/config/blue1.yaml
+ ```
+
+ **Note:** The `kubectl apply` command is a native Kubernetes approach to create a workload. Once it's executed, it activates the JCNR CNI driver, setting up the VRF configurations dynamically.
+
+ **Informational:** The specific hostname (`ip-172-16-1-77` in the example) of your EKS node may differ depending on how AWS has provisioned your EKS cluster. Always verify the correct hostname of your EKS node when accessing the CLI.
+
+ 2. **For EC2 Instances:** For workloads that utilize EC2 instances, the connection to JCNR happens through regular ENI interfaces & VPC subnets. In these scenarios, there's no JCNR CNI involvement. Thus, manual VRF configurations must be added to the JCNR, which are specified in the `red*.conf` and `blue*.conf` files.
+
 
 ### 9. Cleanup or Teardown
 To safely remove all AWS resources and the JCNR deployment:
