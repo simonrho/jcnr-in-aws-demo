@@ -44,6 +44,7 @@ For a smooth deployment experience, we recommend utilizing two separate machines
  - An active AWS account to obtain the necessary AWS access token.
  - Git installed on your setup machine.
  - Basic knowledge of AWS, Kubernetes, and Terraform.
+ - Familiarity with Junos, JCNR, and L3VPN concepts.
 
 
 ## Demo Topology
