@@ -1,6 +1,5 @@
 terraform {
   required_version = ">= 0.12"
-  region           = var.aws_region
 }
 
 
