@@ -6,8 +6,7 @@ output "cluster_name" {
   value = var.cluster_name
 }
 
-output "ce_instance_public_ips" {
-  value       = aws_instance.ce_instance[*].public_ip
-  description = "The public IPs of the CE instances"
+output "ces" {
+  value       = aws_instance.ce_instance[*].public_dns
+  description = "The public DNS of the CE instances"
 }
-

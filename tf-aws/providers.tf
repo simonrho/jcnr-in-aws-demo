@@ -1,8 +1,6 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
 terraform {
   required_version = ">= 0.12"
+  region           = var.aws_region
 }
 
 
@@ -11,7 +9,7 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias = "peer"
+  alias  = "peer"
   region = var.peer_region
 }
 

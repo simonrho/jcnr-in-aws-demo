@@ -1,7 +1,4 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
-#
+# 
 # EKS Worker Nodes Resources
 #  * IAM role allowing Kubernetes actions to access other AWS services
 #  * EKS Node Group to launch worker nodes
@@ -58,7 +55,7 @@ resource "aws_eks_node_group" "demo1" {
   scaling_config {
     desired_size = 1
     max_size     = 1
-    min_size     = 1
+    min_size     = 0
   }
 
   remote_access {

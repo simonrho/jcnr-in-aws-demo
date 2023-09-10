@@ -18,6 +18,7 @@ This repository provides Terraform scripts and configuration files to set up a d
  - EBS CSI driver for Kubernetes.
  - DPDK environment setup DaemonSet in the worker node.
  - Kube config updated to incorporate the newly created EKS cluster.
+ - Local `~/.ssh/config` updated for direct SSH access to EC2 instances running a CE workload.
 
 ## Directory Structure
 
@@ -441,10 +442,12 @@ kubectl get pods -n contrail
  Ensuring consistency across these configurations guarantees that the DPDK environment setup and JCNR installation target the intended EKS worker nodes. Inconsistencies can lead to deployment errors or undesired behavior.
 
 
-## Cleanup or Teardown
-To safely remove all AWS resources and the JCNR deployment:
+## Resource Cleanup
+To securely dismantle all AWS components and the JCNR deployment, follow these steps:
 
 ```bash
 cd tf-aws/
 terraform destroy
 ```
+
+Should you encounter the Error: context deadline exceeded while removing AWS resources, simply execute `terraform destroy` once more to ensure complete resource removal.
