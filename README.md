@@ -369,8 +369,9 @@ kubectl get pods -n contrail
 
  Setting up the JCNR (Junos Cloud-Native Router) involves two primary tasks: configuring the JCNR router itself and adding the corresponding workloads. Workloads come in two flavors: Kubernetes pods that simulate CE (Customer Equipment) devices and EC2 instances. 
 
- 1. **For Kubernetes Pods:** Kubernetes configurations use `.yaml` files located in the `config-east` and `config-west` directories. When you deploy these configurations using `kubectl apply`, the system triggers the JCNR CNI driver. This driver dynamically builds the VRF configuration, adds it, and commits it to the cRPD of JCNR.
+ 1. Setting up JCNR Configurations
 
+ 
  ```bash
  kubectl exec -it -n jcnr kube-crpd-worker-sts-0 -c kube-crpd-worker -- bash
  ```
@@ -391,6 +392,10 @@ kubectl get pods -n contrail
 
  Within this mode, you can copy and paste the desired JCNR configurations directly from the respective `.conf` files found within the `config-east` or `config-west` directories.
 
+ **Informational:** The specific hostname (`ip-172-16-1-77` in the example) of your EKS node may differ depending on how AWS has provisioned your EKS cluster. Always verify the correct hostname of your EKS node when accessing the CLI.
+
+2. **For Kubernetes Pods:** Kubernetes configurations use `.yaml` files located in the `config-east` and `config-west` directories. When you deploy these configurations using `kubectl apply`, the system triggers the JCNR CNI driver. This driver dynamically builds the VRF configuration, adds it, and commits it to the cRPD of JCNR.
+
  Deploy the Kubernetes workloads with:
 
  ```bash
@@ -400,9 +405,8 @@ kubectl get pods -n contrail
 
  **Note:** The `kubectl apply` command is a native Kubernetes approach to create a workload. Once it's executed, it activates the JCNR CNI driver, setting up the VRF configurations dynamically.
 
- **Informational:** The specific hostname (`ip-172-16-1-77` in the example) of your EKS node may differ depending on how AWS has provisioned your EKS cluster. Always verify the correct hostname of your EKS node when accessing the CLI.
 
- 2. **For EC2 Instances:** For workloads that utilize EC2 instances, the connection to JCNR happens through regular ENI interfaces & VPC subnets. In these scenarios, there's no JCNR CNI involvement. Thus, manual VRF configurations must be added to the JCNR, which are specified in the `red*.conf` and `blue*.conf` files.
+ 3. **For EC2 Instances:** For workloads that utilize EC2 instances, the connection to JCNR happens through regular ENI interfaces & VPC subnets. In these scenarios, there's no JCNR CNI involvement. Thus, manual VRF configurations must be added to the JCNR, which are specified in the `red*.conf` and `blue*.conf` files.
 
 
 ## Cleanup or Teardown
