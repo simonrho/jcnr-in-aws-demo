@@ -251,7 +251,7 @@ This script will apply the JCNR secrets and add the `key1=jcnr` label to your EK
 
 
 
- ### Optional: Streamlined Configuration using `setup.sh` 
+### Optionally: Simplified Configuration of Node Labels and Secrets using `setup.sh`
 
  For those looking to simplify and automate the processes described in Sections 5 and 6, the provided `setup.sh` script under the `secrets` directory offers an all-in-one solution. This script serves two main purposes:
 
