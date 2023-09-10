@@ -76,7 +76,7 @@ Run the provided script to install the required tools:
 
  To configure the AWS Command Line Interface (CLI), you'll first need to obtain your Access Key ID and Secret Access Key from the AWS Management Console. Follow the steps below:
 
- #### Obtaining AWS CLI Access Token from AWS Console:
+ #### Obtaining AWS CLI Access Token from AWS Console
 
  1. Sign in to the [AWS Management Console](https://aws.amazon.com/console/).
 
@@ -88,7 +88,7 @@ Run the provided script to install the required tools:
 
  5. You'll see a pop-up window showing your newly created Access Key ID and Secret Access Key. Click "Download .csv" to save these credentials or note them down securely. **Important:** This is the only time you'll be able to view the Secret Access Key via the AWS Console. Ensure you store it securely.
 
- #### Configuring AWS CLI:
+ #### Configuring AWS CLI
 
  Now that you have your AWS Access Key ID and Secret Access Key, you can configure AWS CLI:
 
@@ -364,6 +364,38 @@ helm ls
 kubectl get pods -n jcnr
 kubectl get pods -n contrail
 ```
+
+ ### Important Configuration Consistency Note
+
+ When deploying JCNR and setting up the DPDK environment on your EKS worker nodes, consistency across specific configurations is paramount. Ensure that:
+
+ 1. The `nodeAffinity` configuration in `values.yaml` located in both `config-east/charts` & `config-west/charts` directories is set as:
+ ```yaml
+  nodeAffinity:
+  - key: key1
+    operator: In
+    values:
+    - jcnr
+ ```
+
+ 2. The `node_selector` variable in `variables.yaml` from the `config-east/config` & `config-west/config` folders aligns with:
+ ```hcl
+ variable "node_selector" {
+   description = "Node selector key-value for the Kubernetes DaemonSet adding DPDK env setup in target nodes"
+   type        = map(string)
+   default     = {
+     "key1" = "jcnr"
+   }
+ }
+ ```
+
+ 3. The label added to your EKS worker nodes via the command 
+ ```
+ kubectl label nodes $(kubectl get nodes -o json | jq -r .items[0].metadata.name) "key1=jcnr" --overwrite 
+ ```
+ matches the above configurations.
+
+ Ensuring consistency across these configurations guarantees that the DPDK environment setup and JCNR installation target the intended EKS worker nodes. Inconsistencies can lead to deployment errors or undesired behavior.
 
  ### 10. Configure JCNR and Add workloads 
 
