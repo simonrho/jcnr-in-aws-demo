@@ -39,10 +39,11 @@ This repository provides Terraform scripts and configuration files to set up a d
 ## Before start 
 For a smooth deployment experience, we recommend utilizing two separate machines or virtual machines (VMs) as your setup environment. This ensures that there's no overlap or confusion between the two EKS clusters and their respective Terraform operations. While the guide is crafted for Ubuntu 22.04 as the primary setup machine, other Linux distributions such as CentOS or Rocky Linux should also be compatible. macOS users can adapt this guide, though there might be minor differences in some steps.
 
-## Prerequisites
+ ## Prerequisites
 
-- Git installed on your setup machine.
-- Basic knowledge of AWS, Kubernetes, and Terraform.
+ - An active AWS account to obtain the necessary AWS access token.
+ - Git installed on your setup machine.
+ - Basic knowledge of AWS, Kubernetes, and Terraform.
 
 
 ## Demo Topology
