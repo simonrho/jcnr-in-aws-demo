@@ -365,38 +365,6 @@ kubectl get pods -n jcnr
 kubectl get pods -n contrail
 ```
 
- ### Important Configuration Consistency Note
-
- When deploying JCNR and setting up the DPDK environment on your EKS worker nodes, consistency across specific configurations is paramount. Ensure that:
-
- 1. The `nodeAffinity` configuration in `values.yaml` located in both `config-east/charts` & `config-west/charts` directories is set as:
- ```yaml
-  nodeAffinity:
-  - key: key1
-    operator: In
-    values:
-    - jcnr
- ```
-
- 2. The `node_selector` variable in `variables.yaml` from the `config-east/config` & `config-west/config` folders aligns with:
- ```hcl
- variable "node_selector" {
-   description = "Node selector key-value for the Kubernetes DaemonSet adding DPDK env setup in target nodes"
-   type        = map(string)
-   default     = {
-     "key1" = "jcnr"
-   }
- }
- ```
-
- 3. The label added to your EKS worker nodes via the command 
- ```
- kubectl label nodes $(kubectl get nodes -o json | jq -r .items[0].metadata.name) "key1=jcnr" --overwrite 
- ```
- matches the above configurations.
-
- Ensuring consistency across these configurations guarantees that the DPDK environment setup and JCNR installation target the intended EKS worker nodes. Inconsistencies can lead to deployment errors or undesired behavior.
-
  ### 10. Configure JCNR and Add workloads 
 
  Setting up the JCNR (Junos Cloud-Native Router) involves two primary tasks: configuring the JCNR router itself and adding the corresponding workloads. Workloads come in two flavors: Kubernetes pods that simulate CE (Customer Equipment) devices and EC2 instances. 
@@ -439,6 +407,38 @@ kubectl get pods -n contrail
 
 
  3. **For EC2 Instances:** For workloads that utilize EC2 instances, the connection to JCNR happens through regular ENI interfaces & VPC subnets. In these scenarios, there's no JCNR CNI involvement. Thus, manual VRF configurations must be added to the JCNR, which are specified in the `red*.conf` and `blue*.conf` files.
+
+ ## Important Configuration Consistency Note
+
+ When deploying JCNR and setting up the DPDK environment on your EKS worker nodes, consistency across specific configurations is paramount. Ensure that:
+
+ 1. The `nodeAffinity` configuration in `values.yaml` located in both `config-east/charts` & `config-west/charts` directories is set as:
+ ```yaml
+  nodeAffinity:
+  - key: key1
+    operator: In
+    values:
+    - jcnr
+ ```
+
+ 2. The `node_selector` variable in `variables.yaml` from the `config-east/config` & `config-west/config` folders aligns with:
+ ```hcl
+ variable "node_selector" {
+   description = "Node selector key-value for the Kubernetes DaemonSet adding DPDK env setup in target nodes"
+   type        = map(string)
+   default     = {
+     "key1" = "jcnr"
+   }
+ }
+ ```
+
+ 3. The label added to your EKS worker nodes via the command 
+ ```
+ kubectl label nodes $(kubectl get nodes -o json | jq -r .items[0].metadata.name) "key1=jcnr" --overwrite 
+ ```
+ matches the above configurations.
+
+ Ensuring consistency across these configurations guarantees that the DPDK environment setup and JCNR installation target the intended EKS worker nodes. Inconsistencies can lead to deployment errors or undesired behavior.
 
 
 ## Cleanup or Teardown
