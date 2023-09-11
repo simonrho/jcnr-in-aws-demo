@@ -14,7 +14,7 @@ resource "null_resource" "update_ssh_config" {
       ./ssh_config_update.sh \
       ${var.vpc_secondary_subnets[count.index].hostname} \
       ${aws_instance.ce_instance[count.index].public_dns} \
-      ${local_sensitive_file.my_private_key_file.filename}
+      "${path.cwd}/${local_sensitive_file.my_private_key_file.filename}"
     EOT
     on_failure = continue
   }
