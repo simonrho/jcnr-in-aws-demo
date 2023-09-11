@@ -19,16 +19,16 @@ install_common() {
   # Install AWS CLI
   if ! command -v aws &> /dev/null; then
     echo -e "Installing ${GREEN}AWS CLI${NC}..."
-    log_and_run "curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip'"
-    log_and_run "unzip -q awscliv2.zip"
+    log_and_run "sudo curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip'"
+    log_and_run "sudo unzip -o -q awscliv2.zip"
     log_and_run "sudo ./aws/install --install-dir /usr/local/aws-cli --bin-dir /usr/local/bin"
-    log_and_run "rm -rf awscliv2.zip aws"
+    log_and_run "sudo rm -rf awscliv2.zip aws"
   else
     echo -e "${YELLOW}AWS CLI${NC} is already installed, updating to latest version..."
-    log_and_run "curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip'"
-    log_and_run "unzip -q awscliv2.zip"
+    log_and_run "sudo curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip'"
+    log_and_run "sudo unzip -o -q awscliv2.zip"
     log_and_run "sudo ./aws/install --install-dir /usr/local/aws-cli --bin-dir /usr/local/bin --update"
-    log_and_run "rm -rf awscliv2.zip aws"
+    log_and_run "sudo rm -rf awscliv2.zip aws"
   fi
 
   # Terraform
@@ -46,19 +46,21 @@ install_common() {
   # Install kubectl
   if ! command -v kubectl &> /dev/null; then
     echo -e "Installing ${GREEN}kubectl${NC}..."
-    log_and_run "sudo apt-get install -y kubectl"
+    log_and_run "sudo curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    log_and_run "sudo chmod +x ./kubectl"
+    log_and_run "sudo mv ./kubectl /usr/local/bin/kubectl"
   else
-    echo -e "${YELLOW}kubectl${NC} is already installed, updating to latest version..."
-    log_and_run "sudo apt-get update && sudo apt-get install --only-upgrade kubectl"
+    echo -e "${YELLOW}kubectl${NC} is already installed."
   fi
 
   # Install Helm
   if ! command -v helm &> /dev/null; then
     echo -e "Installing ${GREEN}Helm${NC}..."
-    log_and_run "sudo apt-get install -y helm"
+    log_and_run "sudo curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3"
+    log_and_run "sudo chmod 700 get_helm.sh"
+    log_and_run "sudo ./get_helm.sh"
   else
-    echo -e "${YELLOW}Helm${NC} is already installed, updating to latest version..."
-    log_and_run "sudo apt-get update && sudo apt-get install --only-upgrade helm"
+    echo -e "${YELLOW}Helm${NC} is already installed."
   fi
 
   # Install k9s for Linux
@@ -78,8 +80,8 @@ install_common() {
 if [[ "$OSTYPE" == "darwin"* ]]; then
   echo -e "${GREEN}Detected macOS, installing tools...${NC}"
   log_and_run "brew install awscli terraform kubectl helm k9s"
-elif command -v apt > /dev/null; then
-  log_and_run "sudo apt update -qq"
+elif command -v apt-get > /dev/null; then
+  log_and_run "sudo apt-get update -qq"
   install_common
 elif command -v apt-get > /dev/null; then
   log_and_run "sudo apt-get update -qq"
