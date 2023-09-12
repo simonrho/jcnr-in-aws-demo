@@ -82,9 +82,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   log_and_run "brew install awscli terraform kubectl helm k9s"
 elif command -v apt-get > /dev/null; then
   log_and_run "sudo apt-get update -qq"
-  install_common
-elif command -v apt-get > /dev/null; then
-  log_and_run "sudo apt-get update -qq"
+  log_and_run "sudo apt-get install jq -y -qq"
   install_common
 elif command -v yum > /dev/null; then
   log_and_run "sudo yum update -y -q"
