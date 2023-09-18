@@ -2,8 +2,35 @@
 
 This repository provides Terraform scripts and configuration files to set up a demo environment for the Juniper Cloud-Native Router (JCNR) on AWS. It sets up AWS resources and configures JCNR in both east and west VPCs.
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [AWS Resources Created](#aws-resources-created)
+- [Directory Structure](#directory-structure)
+- [Before start](#before-start)
+- [Prerequisites](#prerequisites)
+- [Demo Topology](#demo-topology)
+- [Setup Guide](#setup-guide)
+  - [1. Clone the Repository](#1-clone-the-repository)
+  - [2. Install Necessary Tools](#2-install-necessary-tools)
+  - [3. AWS Configuration](#3-aws-configuration)
+    - [Obtaining AWS CLI Access Token from AWS Console](#obtaining-aws-cli-access-token-from-aws-console)
+    - [Configuring AWS CLI](#configuring-aws-cli)
+  - [4. Terraform Initialization and Apply](#4-terraform-initialization-and-apply)
+  - [5. Labeling EKS Worker Node](#5-labeling-eks-worker-node)
+  - [6. Setting up JCNR Secrets](#6-setting-up-jcnr-secrets)
+    - [A. Configure `jcnr-secrets.yaml` Manually](#a-configure-jcnr-secretsyaml-manually)
+    - [B. Using the Assistant Tool to Configure `jcnr-secrets.yaml`](#b-using-the-assistant-tool-to-configure-jcnr-secretsyaml)
+  - [Optionally: Simplified Configuration of Node Labels and Secrets using `setup.sh`](#optionally-simplified-configuration-of-node-labels-and-secrets-using-setupsh)
+  - [7. AWS Marketplace Subscription for JCNR](#7-aws-marketplace-subscription-for-jcnr)
+  - [8. Helm Setup for JCNR](#8-helm-setup-for-jcnr)
+  - [9. Install JCNR with Helm](#9-install-jcnr-with-helm)
+  - [10. Configure JCNR and Add workloads](#10-configure-jcnr-and-add-workloads)
+- [Important Configuration Consistency Note](#important-configuration-consistency-note)
+- [Resource Cleanup](#resource-cleanup)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 ## AWS Resources Created
