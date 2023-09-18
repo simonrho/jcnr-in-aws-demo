@@ -148,23 +148,6 @@ kubectl label nodes $(kubectl get nodes -o json | jq -r .items[0].metadata.name)
 
  The `dpdk-env-setup` specifically targets worker nodes that are identified by a unique tag/label. If you wish to modify which nodes are targeted, you can adjust this tag/label specification directly in the Terraform configuration code (`variables.tf`). Furthermore, this tag/label value has significance beyond just the DPDK setup; it's also referenced during the JCNR helm chart installation, as specified in the `values.yaml` file within the JCNR helm charts.
 
- One key detail to be cognizant of is the node reboot mechanism triggered by the DPDK setup. After assigning the specific tag/label, which matches the dpdk env setup label key, to a node, the node will automatically reboot. This reboot is necessary to apply the huge page setup required for optimal DPDK performance. It's imperative to pause for a few minutes, allowing the node to fully restart before proceeding further.
-
-Navigate to the secrets directory:
-```bash
-cd ~/demo/secrets
-```
-
-To run the script and set up the necessary configurations:
-
-```bash
-cd ./secrets
-./setup.sh
-```
-
-This script will apply the JCNR secrets and add the `key1=jcnr` label to your EKS worker nodes.
-
-
  ### 6. Setting up JCNR Secrets
 
  Before you proceed with the installation of JCNR, it's crucial to configure the `jcnr-secrets.yaml` with the required credentials. There are two approaches to achieve this: Manually and using the provided Assistant Tool.
